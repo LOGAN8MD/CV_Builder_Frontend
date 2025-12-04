@@ -24,7 +24,7 @@ export default function EditEditor() {
 
   const [tab, setTab] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  
 
   const [cv, setCV] = useState(null);
 
@@ -348,8 +348,7 @@ export default function EditEditor() {
           </>
         );
 
-      default:
-        return null;
+      default: return null;
     }
   };
 

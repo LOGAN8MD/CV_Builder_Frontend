@@ -19,7 +19,7 @@ const STEP_TITLES = [
 export default function Editor() {
   const { token } = useContext(AuthContext);
   const navigate = useNavigate();
-  const { id } = useParams();
+  
   const location = useLocation();
   const printRef = useRef();
 
@@ -53,10 +53,7 @@ export default function Editor() {
     }
   }, [cvData, layoutDesign]);
 
-  const printPDF = useReactToPrint({
-    content: () => printRef.current,
-    documentTitle: `${cv.basic?.name || "My-CV"}.pdf`,
-  });
+ 
 
   useEffect(() => {
     switch (step) {
@@ -135,6 +132,8 @@ export default function Editor() {
           }
         }
         break;
+        
+      default: return null;
     }
     return true;
   };
