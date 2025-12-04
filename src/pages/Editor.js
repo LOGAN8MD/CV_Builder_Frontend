@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect, useContext } from "react";
-import { useReactToPrint } from "react-to-print";
 import Layout1 from "../layouts/Layout1";
 import axios from "axios";
 import { Url } from "../config";
