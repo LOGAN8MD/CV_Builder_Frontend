@@ -50,7 +50,7 @@ export default function Editor() {
         design: layoutDesign || cv.design,
       });
     }
-  }, [cvData, layoutDesign]);
+  }, [cvData, layoutDesign,cv.design]);
 
  
 
@@ -71,8 +71,16 @@ export default function Editor() {
       case 5:
         if (cv.social.length === 0) addItem("social");
         break;
+      default:
+        break;
     }
-  }, [step]);
+  }, [step,
+  addItem,
+  cv.education.length,
+  cv.experience.length,
+  cv.projects.length,
+  cv.skills.length,
+  cv.social.length]);
 
   // Validation
   const validateStep = () => {
