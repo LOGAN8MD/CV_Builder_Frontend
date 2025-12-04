@@ -43,6 +43,7 @@ export default function Editor() {
   });
 
   // Initialize CV if coming from NewUserLayouts
+  
   useEffect(() => {
     if (cvData) {
       setCV({
@@ -53,7 +54,7 @@ export default function Editor() {
   }, [cvData, layoutDesign,cv.design]);
 
  
-
+/* eslint-disable-next-line react-hooks/exhaustive-deps */
   useEffect(() => {
     switch (step) {
       case 1:
