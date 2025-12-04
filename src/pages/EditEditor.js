@@ -40,7 +40,6 @@ export default function EditEditor() {
         setLoading(false);
       } catch (err) {
         console.error(err);
-        setError("Failed to load CV");
         setLoading(false);
       }
     };
