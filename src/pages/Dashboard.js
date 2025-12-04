@@ -38,6 +38,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     loadCVs();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Infinite scroll

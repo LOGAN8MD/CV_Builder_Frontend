@@ -3,7 +3,7 @@ import Layout1 from "../layouts/Layout1";
 import axios from "axios";
 import { Url } from "../config";
 import { AuthContext } from "../context/AuthContext";
-import { useNavigate, useParams, useLocation } from "react-router-dom";
+import { useNavigate,  useLocation } from "react-router-dom";
 
 const STEP_TITLES = [
   "Basic",
