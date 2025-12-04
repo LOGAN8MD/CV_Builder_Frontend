@@ -75,7 +75,6 @@ export default function Editor() {
         break;
     }
   }, [step,
-  addItem,
   cv.education.length,
   cv.experience.length,
   cv.projects.length,
