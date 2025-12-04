@@ -53,8 +53,28 @@ export default function Editor() {
     }
   }, [cvData, layoutDesign,cv.design]);
 
- 
-/* eslint-disable-next-line react-hooks/exhaustive-deps */
+//  const addItem = useCallback((field) => {
+//   setCV((prev) => ({ ...prev, [field]: [...prev[field], {}] }));
+// }, []);
+
+// useEffect(() => {
+//   if (step === 1 && cv.education.length === 0) addItem("education");
+//   if (step === 2 && cv.experience.length === 0) addItem("experience");
+//   if (step === 3 && cv.projects.length === 0) addItem("projects");
+//   if (step === 4 && cv.skills.length === 0) addItem("skills");
+//   if (step === 5 && cv.social.length === 0) addItem("social");
+// }, [
+//   step,
+//   addItem,
+//   cv.education.length,
+//   cv.experience.length,
+//   cv.projects.length,
+//   cv.skills.length,
+//   cv.social.length
+// ]);
+
+const addItem = (field) => setCV({ ...cv, [field]: [...cv[field], {}] });
+
   useEffect(() => {
     switch (step) {
       case 1:
@@ -76,6 +96,7 @@ export default function Editor() {
         break;
     }
   }, [step,
+    addItem,
   cv.education.length,
   cv.experience.length,
   cv.projects.length,
@@ -167,7 +188,7 @@ export default function Editor() {
     }
   };
 
-  const addItem = (field) => setCV({ ...cv, [field]: [...cv[field], {}] });
+  
   const removeItem = (field, index) => {
     const updated = [...cv[field]];
     updated.splice(index, 1);
