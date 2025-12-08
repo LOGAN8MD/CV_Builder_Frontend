@@ -47,7 +47,7 @@ export default function Register() {
     // Validate all fields
     Object.entries(form).forEach(([field, value]) => validate(field, value));
 
-    if (Object.values(errors).some((msg) => msg)) return; // Stop if any errors
+    if (Object.values(errors).some((msg) => msg)) return; 
 
     setServerError("");
     setLoading(true);

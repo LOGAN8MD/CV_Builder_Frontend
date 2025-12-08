@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useContext } from "react";
+import { useState, useEffect, useContext,useCallback } from "react";
 import Layout1 from "../layouts/Layout1";
 import axios from "axios";
 import { Url } from "../config";
@@ -20,7 +20,7 @@ export default function Editor() {
   const navigate = useNavigate();
   
   const location = useLocation();
-  const printRef = useRef();
+  
 
   const { cvData, layoutDesign } = location.state || {}; // from NewUserLayouts
 
@@ -53,27 +53,14 @@ export default function Editor() {
     }
   }, [cvData, layoutDesign,cv.design]);
 
-//  const addItem = useCallback((field) => {
-//   setCV((prev) => ({ ...prev, [field]: [...prev[field], {}] }));
-// }, []);
 
-// useEffect(() => {
-//   if (step === 1 && cv.education.length === 0) addItem("education");
-//   if (step === 2 && cv.experience.length === 0) addItem("experience");
-//   if (step === 3 && cv.projects.length === 0) addItem("projects");
-//   if (step === 4 && cv.skills.length === 0) addItem("skills");
-//   if (step === 5 && cv.social.length === 0) addItem("social");
-// }, [
-//   step,
-//   addItem,
-//   cv.education.length,
-//   cv.experience.length,
-//   cv.projects.length,
-//   cv.skills.length,
-//   cv.social.length
-// ]);
 
-const addItem = (field) => setCV({ ...cv, [field]: [...cv[field], {}] });
+const addItem = useCallback((field) => {
+  setCV((prevCV) => ({
+    ...prevCV,
+    [field]: [...prevCV[field], {}],
+  }));
+}, []);
 
   useEffect(() => {
     switch (step) {
@@ -161,7 +148,7 @@ const addItem = (field) => setCV({ ...cv, [field]: [...cv[field], {}] });
         }
         break;
         
-      default: return null;
+      default: return true;
     }
     return true;
   };
@@ -176,14 +163,18 @@ const addItem = (field) => setCV({ ...cv, [field]: [...cv[field], {}] });
   };
 
   const saveCV = async () => {
+    console.log("Saving CV:", cv);
     if (!validateStep()) return;
+    
     try {
       await axios.post(`${Url}/api/cv`, cv, {
         headers: { Authorization: `Bearer ${token}` },
       });
+      
       alert("CV Saved Successfully!");
       navigate("/");
     } catch (err) {
+      console.log("Error saving CV:", err);
       setError(err.response?.data?.msg || "Failed to save CV");
     }
   };
@@ -478,7 +469,7 @@ const addItem = (field) => setCV({ ...cv, [field]: [...cv[field], {}] });
       </div>
 
       {/* PREVIEW */}
-      <div ref={printRef} className="p-4 bg-gray-100 overflow-y-auto border rounded">
+      <div  className="p-4 bg-gray-100 overflow-y-auto border rounded">
         <Layout1 data={cv} />
       </div>
     </div>

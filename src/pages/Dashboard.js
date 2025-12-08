@@ -42,18 +42,18 @@ export default function Dashboard() {
   }, []);
 
   // Infinite scroll
-  useEffect(() => {
-    const handleScroll = () => {
-      if (
-        window.innerHeight + window.scrollY + 50 >=
-        document.documentElement.scrollHeight
-      ) {
-        loadCVs();
-      }
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [loadCVs]);
+  // useEffect(() => {
+  //   const handleScroll = () => {
+  //     if (
+  //       window.innerHeight + window.scrollY + 50 >=
+  //       document.documentElement.scrollHeight
+  //     ) {
+  //       loadCVs();
+  //     }
+  //   };
+  //   window.addEventListener("scroll", handleScroll);
+  //   return () => window.removeEventListener("scroll", handleScroll);
+  // }, [loadCVs]);
 
   const handleLogout = () => {
     logout();

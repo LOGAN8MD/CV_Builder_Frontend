@@ -34,23 +34,7 @@ export default function Login() {
     validate(field, value);
   };
 
-  // const submit = async () => {
-  //   // Check all fields before submit
-  //   Object.entries(form).forEach(([field, value]) => validate(field, value));
 
-  //   if (Object.values(errors).some((msg) => msg)) return; // Stop if any validation errors
-  //   setServerError("");
-  //   setLoading(true);
-
-  //   try {
-  //     const res = await axios.post(`${Url}/api/auth/login`, form);
-  //     login(res.data.user, res.data.token);
-  //   } catch (err) {
-  //     setServerError(err.response?.data?.msg || "Something went wrong");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
 
   const submit = async () => {
   // Validate all fields
@@ -69,7 +53,7 @@ export default function Login() {
 
   setErrors(validationErrors);
 
-  if (Object.keys(validationErrors).length > 0) return; // Stop if any errors
+  if (Object.keys(validationErrors).length > 0) return; 
 
   setServerError("");
   setLoading(true);
@@ -77,10 +61,10 @@ export default function Login() {
   try {
     const res = await axios.post(`${Url}/api/auth/login`, form);
    
-    // Save user and token
+    
     login(res.data.user, res.data.token);
      console.log(res.data)
-    // Redirect to dashboard
+   
     navigate("/");
 
   } catch (err) {
