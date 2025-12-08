@@ -7,13 +7,100 @@ import { createRoot } from "react-dom/client";
 import { Url } from "../config";
 import { AuthContext } from "../context/AuthContext";
 
-
 export default function ExistingCVs({ cvs, setCVs }) {
   const navigate = useNavigate();
-    const { token } = useContext(AuthContext);
+  const { token } = useContext(AuthContext);
+
   const [previewCV, setPreviewCV] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [shareTarget, setShareTarget] = useState(null);
+
+  // ------------------------------------
+  // 1️⃣ PAYMENT FUNCTIONS
+  // ------------------------------------
+
+  const initiatePayment = async () => {
+    try {
+      const res = await fetch(`${Url}/api/payment/order`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          amount: 50, // charge ₹50 per download/share
+          currency: "INR",
+          receipt: "cv_pay_" + Date.now(),
+        }),
+      });
+
+      return await res.json();
+    } catch (err) {
+      console.error("Order creation failed:", err);
+      alert("Failed to create order.");
+      return null;
+    }
+  };
+
+  const openRazorpay = (order, onSuccessCallback) => {
+    return new Promise((resolve, reject) => {
+      const options = {
+        key: process.env.REACT_APP_RAZORPAY_KEY_ID, 
+        amount: order.amount,
+        currency: order.currency,
+        name: "CV Builder",
+        description: "Payment for premium action",
+        order_id: order.id,
+        handler: async function (response) {
+          try {
+            const verifyRes = await fetch(`${Url}/api/payment/verify`, {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+              }),
+            });
+
+            const verifyData = await verifyRes.json();
+
+            if (verifyData.status === "success") {
+              onSuccessCallback();
+              resolve();
+            } else {
+              alert("Payment verification failed.");
+              reject();
+            }
+          } catch (err) {
+            console.error("Verification error:", err);
+            alert("Payment verification error.");
+            reject();
+          }
+        },
+        theme: {
+          color: "#3399cc",
+        },
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.open();
+    });
+  };
+
+  const payThen = async (actionCallback) => {
+    const order = await initiatePayment();
+    if (!order?.id) return;
+
+    await openRazorpay(order, actionCallback);
+  };
+
+  // ------------------------------------
+  // 2️⃣ EXISTING FUNCTIONS (unchanged)
+  // ------------------------------------
 
   const confirmDelete = async (cvId, token) => {
     try {
@@ -95,40 +182,73 @@ export default function ExistingCVs({ cvs, setCVs }) {
     setShareTarget(null);
   };
 
+  // ------------------------------------
+  // 3️⃣ UI COMPONENT
+  // ------------------------------------
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       {cvs.map((cv) => (
         <div key={cv._id} className="border p-4 rounded shadow">
-          <h2 className="font-bold" style={{fontFamily: cv.design.fontFamily,fontSize: cv.design.fontSize,color: cv.design.accentColor
-}}>{cv.basic?.name || "Untitled CV"}</h2>
-          <p className="text-gray-600" style={{fontFamily: cv.design.fontFamily,fontSize: cv.design.fontSize,color: cv.design.primaryColor
-}} >{cv.basic?.intro || ""}</p>
-          <div>{console.log(cv)}</div>
+          <h2
+            className="font-bold"
+            style={{
+              fontFamily: cv.design.fontFamily,
+              fontSize: cv.design.fontSize,
+              color: cv.design.accentColor,
+            }}
+          >
+            {cv.basic?.name || "Untitled CV"}
+          </h2>
+
+          <p
+            className="text-gray-600"
+            style={{
+              fontFamily: cv.design.fontFamily,
+              fontSize: cv.design.fontSize,
+              color: cv.design.primaryColor,
+            }}
+          >
+            {cv.basic?.intro || ""}
+          </p>
+
           <div className="mt-4 flex flex-wrap gap-2">
+
+            {/* EDIT */}
             <button
               className="bg-blue-500 text-white px-2 py-1 rounded"
               onClick={() => navigate(`/editor/${cv._id}`)}
             >
               Edit
             </button>
+
+            {/* PREVIEW */}
             <button
               className="bg-gray-500 text-white px-2 py-1 rounded"
               onClick={() => setPreviewCV(cv)}
             >
               Preview
             </button>
+
+            {/* DOWNLOAD — NOW WITH PAYMENT */}
             <button
               className="bg-purple-500 text-white px-2 py-1 rounded"
-              onClick={() => handleDownloadClientPDF(cv)}
+              onClick={() => payThen(() => handleDownloadClientPDF(cv))}
             >
               Download
             </button>
+
+            {/* SHARE — NOW WITH PAYMENT */}
             <button
               className="bg-yellow-500 text-white px-2 py-1 rounded"
-              onClick={() => setShareTarget(cv._id)}
+              onClick={() =>
+                payThen(() => setShareTarget(cv._id))
+              }
             >
               Share
             </button>
+
+            {/* DELETE */}
             <button
               className="bg-red-500 text-white px-2 py-1 rounded"
               onClick={() => setDeleteTarget(cv._id)}
@@ -186,7 +306,9 @@ export default function ExistingCVs({ cvs, setCVs }) {
             <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
               <div className="bg-white p-6 rounded shadow-lg w-80">
                 <h2 className="text-xl font-bold mb-4">Delete CV?</h2>
-                <p className="text-gray-600 mb-4">This action cannot be undone.</p>
+                <p className="text-gray-600 mb-4">
+                  This action cannot be undone.
+                </p>
                 <div className="flex justify-end gap-3">
                   <button
                     className="px-4 py-1 bg-gray-300 rounded"
@@ -204,6 +326,7 @@ export default function ExistingCVs({ cvs, setCVs }) {
               </div>
             </div>
           )}
+
         </div>
       ))}
     </div>
