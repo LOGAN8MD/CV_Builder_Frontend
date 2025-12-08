@@ -1,11 +1,17 @@
-import { useState } from "react";
+import { useState,useContext } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { Url } from "../config";
+import { GoogleLogin } from "@react-oauth/google";
+import { AuthContext } from "../context/AuthContext";
+
 
 
 export default function Register() {
+
+  const { login } = useContext(AuthContext);
   const navigate = useNavigate();
+
   const [form, setForm] = useState({
     username: "",
     email: "",
@@ -62,6 +68,19 @@ export default function Register() {
       setLoading(false);
     }
   };
+
+  const handleGoogleLogin = async (credentialResponse) => {
+  try {
+    const res = await axios.post(`${Url}/api/auth/google-login`, {
+      tokenId: credentialResponse.credential,
+    });
+    console.log(res.data)
+    login(res.data.user, res.data.token); // save in context
+    navigate("/");
+  } catch (err) {
+    console.error("Google login failed", err);
+  }
+};
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
@@ -127,6 +146,10 @@ export default function Register() {
             {loading ? "Registering..." : "Register"}
           </button>
 
+          <GoogleLogin
+              onSuccess={handleGoogleLogin}
+              onError={() => console.log("Login Failed")}
+            />
         
 
           <p className="text-center text-sm">

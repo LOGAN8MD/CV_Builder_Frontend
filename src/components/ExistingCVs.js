@@ -28,7 +28,7 @@ export default function ExistingCVs({ cvs, setCVs }) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          amount: 50, // charge ₹50 per download/share
+          amount: 1, // charge ₹50 per download/share
           currency: "INR",
           receipt: "cv_pay_" + Date.now(),
         }),
